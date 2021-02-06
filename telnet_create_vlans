@@ -22,7 +22,7 @@ for IP in f:
 
     for n in range(2, 11):
         tn.write(b"vlan " + str(n).encode('ascii') + b"\n")
-        tn.write(b"name Python_VLAN_" + str(n).encode('ascii') + b"\n")
+        tn.write(b"name VLAN_" + str(n).encode('ascii') + b"\n")
 
 tn.write(b"end\n")
 tn.write(b"wr mem\n")

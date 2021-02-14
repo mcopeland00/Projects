@@ -4,7 +4,7 @@ import getpass
 username = input('Username: ')
 password = getpass.getpass()
 
-# Opens th list of switches
+# Opens the list of switches
 with open('Switch_ips') as file:
     devices_list = file.read().splitlines()
 

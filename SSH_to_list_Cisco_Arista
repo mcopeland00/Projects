@@ -1,0 +1,46 @@
+from netmiko import ConnectHandler
+import getpass
+
+username = input('Username: ')
+password = getpass.getpass()
+
+# Opens the list of cisco switches
+with open('Cisco_ips') as file:
+    devices_list_cisco = file.read().splitlines()
+
+# Opens the list of Arista switches
+with open('Arista_ips') as file:
+    devices_list_arista = file.read().splitlines()
+
+# Opens the commands file
+with open('Commands_file') as file:
+    Commands_file = file.read().splitlines()
+
+#cisco Switchs
+for devices in devices_list_cisco:
+    print('Connecting to device: ' + devices)
+    ip_address_of_device = devices
+    iosv_l2 = {
+    'device_type': 'cisco_ios',
+    'ip': ip_address_of_device,
+    'username': username,
+    'password': password,
+}
+
+    net_connect = ConnectHandler(**iosv_l2)
+    output = net_connect.send_command('show version')
+    print (output)
+
+# Arista Switches
+for devices in devices_list_arista:
+    print('Connecting to device: ' + devices)
+    ip_address_of_device = devices
+    arista_vEOS = {
+    'device_type': 'arista_eos',
+    'ip': ip_address_of_device,
+    'username': username,
+    'password': password,
+}
+    net_connect = ConnectHandler(**arista_vEOS)
+    output = net_connect.send_command('show version')
+    print(output)

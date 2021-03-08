@@ -1,0 +1,70 @@
+from netmiko import ConnectHandler
+from pprint import pprint
+from time import time
+import json
+import getpass
+import os
+
+username = input('Username: ')
+password = getpass.getpass()
+
+
+# changes working directory
+# os.chdir('C:\SwitchBackups')
+
+def read_devices(switches):
+    devices = {}  # create our dictionary for storing devices and their info
+
+    with open(switches) as devices_file:
+        print(devices_file)
+        for device_line in devices_file:
+            device_info = device_line.strip().split(',')  # extract device info from line
+
+            device = {'ipaddr': device_info[0],
+                      'type': device_info[1],
+                      'name': device_info[2]}  # create dictionary of device objects ...
+
+            devices[device['ipaddr']] = device  # store our device in the devices dictionary
+            # note the key for devices dictionary entries is ipaddr
+
+    print('\n----- devices --------------------------')
+    pprint(devices)
+
+    return devices
+
+
+def config_worker(device):
+    # ---- Connect to the device ----
+    if device['type'] == 'Arista':
+        device_type = 'arista_eos'
+    elif device['type'] == 'cisco-ios':
+        device_type = 'cisco_ios'
+    else:
+        device_type = 'cisco_ios'  # attempt Cisco IOS as default
+
+    print('---- Connecting to device {0}, username={1}, password={2}'.format(device['ipaddr']))
+
+    # ---- Connect to the device
+    session = ConnectHandler(device_type=device_type, ip=device['ipaddr'],
+                             username='username', password='password')
+
+    if device_type == 'arista_eos':
+        # ---- Use CLI command to get configuration data from device
+        print('---- Getting configuration from device')
+        config_data = session.send_command('show run')
+
+    if device_type == 'cisco_ios':
+        # ---- Use CLI command to get configuration data from device
+        print('---- Getting configuration from device')
+        config_data = session.send_command('show run')
+
+    # ---- Write out configuration information to file
+    config_filename = 'config-' + device['ipaddr']  # Important - create unique configuration file name
+
+    print('---- Writing configuration: ', config_filename)
+    with open(config_filename, 'w') as config_out:
+        config_out.write(config_data)
+
+    session.disconnect()
+
+    return

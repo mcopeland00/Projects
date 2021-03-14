@@ -5,44 +5,28 @@ import json
 import getpass
 import os
 
-username = input('Username: ')
-password = getpass.getpass()
 
 
 # changes working directory
 # os.chdir('C:\SwitchBackups')
 
 def read_devices(switches):
-    devices = {}  # create our dictionary for storing devices and their info
-
-    with open(switches) as devices_file:
-        print(devices_file)
-        for device_line in devices_file:
+    devices = {}
+    with open('switches') as file:
+        for device_line in file:
             device_info = device_line.strip().split(',')  # extract device info from line
-
+             #print(device_line)
             device = {'ipaddr': device_info[0],
                       'type': device_info[1],
-                      'name': device_info[2]}  # create dictionary of device objects ...
-
-            devices[device['ipaddr']] = device  # store our device in the devices dictionary
-            # note the key for devices dictionary entries is ipaddr
-
-    print('\n----- devices --------------------------')
-    pprint(devices)
-
+                      'name': device_info[2]}
+            devices[device['ipaddr']] = device
     return devices
-
-
 def config_worker(device):
     # ---- Connect to the device ----
-    if device['type'] == 'Arista':
-        device_type = 'arista_eos'
-    elif device['type'] == 'cisco-ios':
-        device_type = 'cisco_ios'
-    else:
-        device_type = 'cisco_ios'  # attempt Cisco IOS as default
+    if device['type'] == 'Arista': device_type = 'arista_eos'
+    elif device['type'] == 'cisco-ios': device_type = 'cisco_ios'
 
-    print('---- Connecting to device {0}, username={1}, password={2}'.format(device['ipaddr']))
+
 
     # ---- Connect to the device
     session = ConnectHandler(device_type=device_type, ip=device['ipaddr'],
@@ -68,3 +52,9 @@ def config_worker(device):
     session.disconnect()
 
     return
+username = input('Username: ')
+password = getpass.getpass()
+
+devices = read_devices('switches')
+for device in devices.items():
+    config_worker(device)

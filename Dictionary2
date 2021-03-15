@@ -1,0 +1,59 @@
+from netmiko import ConnectHandler
+import getpass
+# import os
+
+username = input('Username: ')
+password = getpass.getpass()
+
+# changes working directory
+# os.chdir('C:\SwitchBackups')
+
+def read_devices(switches):
+    devices = {}
+    with open('switches') as file:
+        for device_line in file:
+            device_info = device_line.strip().split(', ')  # extract device info from line
+             #print(device_line)
+            device = {'ipaddr': device_info[0],
+                      'type': device_info[1],
+                      'name': device_info[2]}
+            devices[device['ipaddr']] = device
+    return devices
+def config_worker(device):
+    # ---- Connect to the device ----
+    device_type = 'network'
+    if device['type'] == 'Arista':
+        device_type = 'arista_eos'
+    elif device['type'] == 'cisco-ios':
+        device_type = 'cisco_ios'
+
+    # ---- Connect to the device
+    session = ConnectHandler(device_type=device_type, ip=read_devices(['ipaddr']))
+
+    if device_type == 'arista_eos':
+        # ---- Use CLI command to get configuration data from device
+        print('---- Getting configuration from device')
+        config_data = session.send_command('show run')
+
+    if device_type == 'cisco_ios':
+        # ---- Use CLI command to get configuration data from device
+        print('---- Getting configuration from device')
+        config_data = session.send_command('show run')
+
+    # ---- Write out configuration information to file
+    config_filename = 'config-' + device['ipaddr']  # Important - create unique configuration file name
+
+    print('---- Writing configuration: ', config_filename)
+    with open(config_filename, 'w') as config_out:
+        config_out.write(config_data)
+
+    session.disconnect()
+
+    return
+
+
+
+
+devices = read_devices('switches')
+for device in devices.items():
+    config_worker(device[1])

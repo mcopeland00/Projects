@@ -28,7 +28,7 @@ def config_worker(device):
         device_type = 'cisco_ios'
 
     # ---- Connect to the device
-    session = ConnectHandler(device_type=device_type, ip=read_devices(['ipaddr']))
+    session = ConnectHandler(device_type=device_type, ip=read_devices(['ipaddr'], username ='username', password = getpass()))
 
     if device_type == 'arista_eos':
         # ---- Use CLI command to get configuration data from device

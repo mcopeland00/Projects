@@ -1,16 +1,31 @@
-# SSH to Multiple Devices from devices file
-from netmiko import ConnectHandler
- 
-with open('devices.txt') as routers:
-    for IP in routers:
-        Router = {
-            'device_type': 'cisco_ios',
-            'ip': IP,
-            'username': 'roger',
-            'password': 'cisco'
-        }
- 
-        net_connect = ConnectHandler(**Router)
+import getpass
+import os
+
+username = input('Username: ')
+password = getpass.getpass()
+
+# changes working directory
+os.chdir('C:\SwitchBackups')
+
+# Opens the list of switches
+with open('Switch_ips.txt') as file:
+    devices_list_switches = file.read().splitlines()
+
+# Opens the list of Firewalls
+with open('FW_ips.txt') as file:
+    devices_list_firewall = file.read().splitlines()
+
+
+#connecting to Switchs
+for devices in devices_list_switches:
+    print('Connecting to device: ' + devices)
+    ip_address_of_device = devices
+    iosv_l2 = {
+    'device_type': 'cisco_ios',
+    'ip': ip_address_of_device,
+    'username': username,
+    'password': password,
+}
  
         hostname = net_connect.send_command('show run | i host')
         hostname.split(" ")

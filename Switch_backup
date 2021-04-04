@@ -28,12 +28,12 @@ for devices in devices_list_switches:
     'password': password,
 }
     hostname = net_connect = ConnectHandler(**iosv_l2)
-    output = net_connect.send_command('show run | i host')
+    hostname = net_connect.send_command('show run | i hostname')
     hostname.split(" ")
     hostname,device = hostname.split(" ")
     print ("Backing up " + device)
     
-    filename = + device + '.txt'
+    filename = device +'.txt'
     # filename = device + '.txt' 
  
     showrun = net_connect.send_command('show run')
